@@ -262,32 +262,53 @@ function initVideoScrub() {
 /* ---------- Scroll-linked marquee ---------- */
 function initMarqueeScroll() {
   const track = document.querySelector('.marquee-track')
-  if (!track || reducedMotion) return
+  if (!track) return
 
-  const wrapWidth = () => track.scrollWidth / 2 || 1
+  let loop = 1
 
-  const applyX = (scrollY) => {
-    // Scroll down → move right; scroll up → move left
-    const loop = wrapWidth()
-    let x = scrollY * 0.45
-    x = ((x % loop) + loop) % loop
-    gsap.set(track, { x })
+  const measure = () => {
+    // Two identical groups → loop length is half the track
+    loop = Math.max(track.scrollWidth / 2, 1)
   }
 
-  applyX(window.scrollY || 0)
+  const applyX = (scrollY) => {
+    measure()
+    // Scroll down → move right; scroll up → move left
+    let x = Number(scrollY) * 0.7
+    x = ((x % loop) + loop) % loop
+    track.style.transform = `translate3d(${x}px, 0, 0)`
+  }
 
-  ScrollTrigger.create({
-    start: 0,
-    end: 'max',
-    onUpdate: (self) => {
-      applyX(self.scroll())
-    },
+  const readScroll = () => {
+    if (lenis && typeof lenis.scroll === 'number') return lenis.scroll
+    return window.scrollY || document.documentElement.scrollTop || 0
+  }
+
+  // Wait one frame so layout/fonts resolve scrollWidth
+  requestAnimationFrame(() => {
+    measure()
+    applyX(readScroll())
   })
+
+  if (lenis) {
+    lenis.on('scroll', ({ scroll }) => {
+      applyX(scroll)
+    })
+  }
+
+  window.addEventListener(
+    'scroll',
+    () => {
+      applyX(readScroll())
+    },
+    { passive: true },
+  )
 
   window.addEventListener(
     'resize',
     () => {
-      applyX(ScrollTrigger.scroll() || window.scrollY || 0)
+      measure()
+      applyX(readScroll())
     },
     { passive: true },
   )
