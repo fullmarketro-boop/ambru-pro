@@ -368,6 +368,40 @@ function initServiceCards() {
   })
 }
 
+/* ---------- Cursor spotlight on segments ---------- */
+function initSpotlights() {
+  if (reducedMotion || !pointerQuery.matches) return
+
+  const spots = document.querySelectorAll('[data-spotlight]')
+  if (!spots.length) return
+
+  spots.forEach((el) => {
+    if (!el.querySelector(':scope > .spot-glow')) {
+      const glow = document.createElement('span')
+      glow.className = 'spot-glow'
+      glow.setAttribute('aria-hidden', 'true')
+      el.prepend(glow)
+    }
+
+    const onMove = (event) => {
+      const rect = el.getBoundingClientRect()
+      const x = ((event.clientX - rect.left) / rect.width) * 100
+      const y = ((event.clientY - rect.top) / rect.height) * 100
+      el.style.setProperty('--spot-x', `${x}%`)
+      el.style.setProperty('--spot-y', `${y}%`)
+      el.classList.add('is-spot-on')
+    }
+
+    const onLeave = () => {
+      el.classList.remove('is-spot-on')
+    }
+
+    el.addEventListener('pointermove', onMove)
+    el.addEventListener('pointerenter', onMove)
+    el.addEventListener('pointerleave', onLeave)
+  })
+}
+
 /* ---------- Premium scroll timeline ---------- */
 function initTimeline() {
   const section = document.getElementById('expertise')
@@ -380,7 +414,7 @@ function initTimeline() {
 
   if (reducedMotion) {
     items.forEach((item) => item.classList.add('is-active'))
-    if (progress) progress.style.height = '100%'
+    if (progress) gsap.set(progress, { scaleY: 1 })
     return
   }
 
@@ -399,34 +433,38 @@ function initTimeline() {
     }
   }
 
-  items.forEach((item, index) => {
-    ScrollTrigger.create({
-      trigger: item,
-      start: 'top 72%',
-      end: 'bottom 45%',
-      onEnter: () => activate(index),
-      onEnterBack: () => activate(index),
-    })
-  })
-
   if (progress) {
-    gsap.fromTo(
-      progress,
-      { height: '0%' },
-      {
-        height: '100%',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: timeline,
-          start: 'top 70%',
-          end: 'bottom 35%',
-          scrub: 0.55,
+    gsap.set(progress, { scaleY: 0, transformOrigin: 'top center' })
+    gsap.to(progress, {
+      scaleY: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: timeline,
+        start: 'top 72%',
+        end: 'bottom 38%',
+        scrub: 0.45,
+        onUpdate: (self) => {
+          const idx = Math.min(
+            items.length - 1,
+            Math.floor(self.progress * items.length + 0.001),
+          )
+          activate(idx)
         },
+        onLeave: () => activate(items.length - 1),
+        onLeaveBack: () => activate(-1),
       },
-    )
+    })
+  } else {
+    items.forEach((item, index) => {
+      ScrollTrigger.create({
+        trigger: item,
+        start: 'top 72%',
+        onEnter: () => activate(index),
+        onEnterBack: () => activate(index),
+      })
+    })
   }
 
-  // Soft parallax on the ghost year
   if (ghost) {
     gsap.to(ghost, {
       yPercent: 18,
@@ -443,6 +481,7 @@ function initTimeline() {
 
 /* ---------- Premium process loop ---------- */
 function initProcess() {
+  const section = document.getElementById('process')
   const board = document.querySelector('[data-process]')
   const progress = document.querySelector('[data-process-progress]')
   const steps = gsap.utils.toArray('[data-process-step]')
@@ -454,10 +493,7 @@ function initProcess() {
 
   if (reducedMotion) {
     steps.forEach((step) => step.classList.add('is-active'))
-    if (progress) {
-      progress.style.width = '100%'
-      progress.style.height = '100%'
-    }
+    if (progress) gsap.set(progress, { scaleX: 1, scaleY: 1 })
     return
   }
 
@@ -467,54 +503,50 @@ function initProcess() {
     })
   }
 
-  steps.forEach((step, index) => {
-    ScrollTrigger.create({
-      trigger: step,
-      start: 'top 78%',
-      end: 'bottom 40%',
-      onEnter: () => activate(index),
-      onEnterBack: () => activate(index),
+  const desktop = window.matchMedia('(min-width: 900px)')
+  let progressTween
+
+  const applyProgress = () => {
+    progressTween?.scrollTrigger?.kill()
+    progressTween?.kill()
+    if (!progress) return
+
+    const prop = desktop.matches ? 'scaleX' : 'scaleY'
+    const origin = desktop.matches ? 'left center' : 'top center'
+    const other = desktop.matches ? 'scaleY' : 'scaleX'
+
+    gsap.set(progress, {
+      [prop]: 0,
+      [other]: 1,
+      transformOrigin: origin,
     })
-  })
 
-  if (progress) {
-    const desktop = window.matchMedia('(min-width: 900px)')
-    let progressTween
-
-    const applyProgress = () => {
-      progressTween?.scrollTrigger?.kill()
-      progressTween?.kill()
-
-      if (desktop.matches) {
-        gsap.set(progress, { height: '100%', width: '0%' })
-        progressTween = gsap.to(progress, {
-          width: '100%',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: board,
-            start: 'top 70%',
-            end: 'bottom 40%',
-            scrub: 0.55,
-          },
-        })
-      } else {
-        gsap.set(progress, { width: '100%', height: '0%' })
-        progressTween = gsap.to(progress, {
-          height: '100%',
-          ease: 'none',
-          scrollTrigger: {
-            trigger: board,
-            start: 'top 70%',
-            end: 'bottom 40%',
-            scrub: 0.55,
-          },
-        })
-      }
-    }
-
-    applyProgress()
-    desktop.addEventListener('change', applyProgress)
+    progressTween = gsap.to(progress, {
+      [prop]: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section || board,
+        start: 'top 68%',
+        end: 'bottom 42%',
+        scrub: 0.45,
+        onUpdate: (self) => {
+          const idx = Math.min(
+            steps.length - 1,
+            Math.floor(self.progress * steps.length + 0.001),
+          )
+          activate(idx)
+        },
+        onLeave: () => activate(steps.length - 1),
+        onLeaveBack: () => activate(-1),
+      },
+    })
   }
+
+  applyProgress()
+  desktop.addEventListener('change', () => {
+    applyProgress()
+    ScrollTrigger.refresh()
+  })
 
   if (ghost) {
     gsap.to(ghost, {
@@ -551,7 +583,7 @@ function initProcessProof() {
     chips.forEach((el) => el.classList.add('is-on'))
     huds.forEach((el) => el.classList.add('is-on'))
     nodes.forEach((el) => el.classList.add('is-on'))
-    if (fill) fill.style.width = '100%'
+    if (fill) gsap.set(fill, { scaleX: 1 })
     return
   }
 
@@ -572,32 +604,33 @@ function initProcessProof() {
     },
   })
 
-  // Stage the three verbs as the panel crosses the viewport
-  ;[0, 1, 2].forEach((stage) => {
-    ScrollTrigger.create({
-      trigger: proof,
-      start: `top ${72 - stage * 10}%`,
-      end: 'bottom 35%',
-      onEnter: () => setStage(stage),
-      onEnterBack: () => setStage(stage),
-    })
-  })
-
   if (fill) {
-    gsap.fromTo(
-      fill,
-      { width: '0%' },
-      {
-        width: '100%',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: proof,
-          start: 'top 75%',
-          end: 'center 40%',
-          scrub: 0.6,
+    gsap.set(fill, { scaleX: 0, transformOrigin: 'left center' })
+    gsap.to(fill, {
+      scaleX: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: proof,
+        start: 'top 78%',
+        end: 'center 42%',
+        scrub: 0.45,
+        onUpdate: (self) => {
+          const stage = Math.min(2, Math.floor(self.progress * 3 + 0.001))
+          setStage(stage)
         },
+        onLeave: () => setStage(2),
+        onLeaveBack: () => setStage(-1),
       },
-    )
+    })
+  } else {
+    ;[0, 1, 2].forEach((stage) => {
+      ScrollTrigger.create({
+        trigger: proof,
+        start: `top ${72 - stage * 10}%`,
+        onEnter: () => setStage(stage),
+        onEnterBack: () => setStage(stage),
+      })
+    })
   }
 
   if (img) {
@@ -803,6 +836,8 @@ function boot() {
   initTimeline()
   initProcess()
   initBenefits()
+  initSpotlights()
+  requestAnimationFrame(() => ScrollTrigger.refresh())
 }
 
 boot()
