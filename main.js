@@ -8,7 +8,6 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const mobileQuery = window.matchMedia('(max-width: 767px)')
 const pointerQuery = window.matchMedia('(pointer: fine)')
 
-const video = document.getElementById('scroll-video')
 const header = document.querySelector('.site-header')
 const year = document.getElementById('year')
 const navToggle = document.querySelector('.nav-toggle')
@@ -16,6 +15,7 @@ const mobileNav = document.getElementById('mobile-nav')
 const form = document.getElementById('contact-form')
 const formSuccess = document.getElementById('form-success')
 const cursorGlow = document.querySelector('.cursor-glow')
+const poster = document.querySelector('.media-poster')
 
 if (year) year.textContent = String(new Date().getFullYear())
 
@@ -177,20 +177,13 @@ function initParallax() {
 
 /* ---------- Hero portrait background (scroll-linked) ---------- */
 function initHeroBackground() {
-  // Always show the portrait photo — not the empty-room video
-  setPosterMode(true)
-
-  const poster = document.querySelector('.media-poster')
   if (!poster || reducedMotion) return
 
   const apply = (scrollY) => {
-    const y = Math.min(Number(scrollY) || 0, 1200)
-    // Subtle drift so the portrait background feels alive while scrolling
-    const shiftY = y * 0.04
-    const scale = 1.06 + Math.min(y, 800) * 0.00004
+    const y = Math.min(Math.max(Number(scrollY) || 0, 0), 1400)
+    const shiftY = y * 0.03
+    const scale = 1.05 + Math.min(y, 900) * 0.00003
     poster.style.transform = `translate3d(0, ${shiftY}px, 0) scale(${scale})`
-    // Keep face in frame: locked toward left-top of the wide hero shot
-    poster.style.objectPosition = '28% 12%'
   }
 
   const readScroll = () => {
@@ -204,11 +197,7 @@ function initHeroBackground() {
     lenis.on('scroll', ({ scroll }) => apply(scroll))
   }
 
-  window.addEventListener(
-    'scroll',
-    () => apply(readScroll()),
-    { passive: true },
-  )
+  window.addEventListener('scroll', () => apply(readScroll()), { passive: true })
 }
 
 /* ---------- Scroll-linked marquee ---------- */
@@ -299,7 +288,6 @@ form?.addEventListener('submit', (event) => {
 
 /* ---------- Boot ---------- */
 function boot() {
-  setPosterMode(true)
   initLenis()
   initCursorGlow()
   initHeader()
@@ -308,11 +296,6 @@ function boot() {
   initParallax()
   initMarqueeScroll()
   initHeroBackground()
-}
-
-function setPosterMode(on) {
-  document.body.classList.toggle('use-poster', on)
-  document.body.classList.toggle('has-video', !on)
 }
 
 boot()

@@ -55,21 +55,19 @@
       }
     </script>
   </head>
-  <body>
+  <body class="use-poster">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="media-layer" aria-hidden="true">
-      <video
-        id="scroll-video"
-        class="media-video"
-        muted
-        playsinline
-        preload="auto"
-        poster="/brand-hero-reference.webp"
-      >
-        <source src="/brand-scroll-background.mp4" type="video/mp4" />
-      </video>
-      <img class="media-poster" src="/brand-hero-reference.webp" alt="" width="1920" height="1080" />
+      <img
+        class="media-poster"
+        src="/brand-hero-reference.webp"
+        alt=""
+        width="1920"
+        height="1080"
+        fetchpriority="high"
+        decoding="async"
+      />
       <div class="media-tint"></div>
       <div class="media-grain"></div>
       <div class="media-vignette"></div>
