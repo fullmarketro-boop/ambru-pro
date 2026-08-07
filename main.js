@@ -259,6 +259,40 @@ function initVideoScrub() {
   })
 }
 
+/* ---------- Scroll-linked marquee ---------- */
+function initMarqueeScroll() {
+  const track = document.querySelector('.marquee-track')
+  if (!track || reducedMotion) return
+
+  const wrapWidth = () => track.scrollWidth / 2 || 1
+
+  const applyX = (scrollY) => {
+    // Scroll down → move right; scroll up → move left
+    const loop = wrapWidth()
+    let x = scrollY * 0.45
+    x = ((x % loop) + loop) % loop
+    gsap.set(track, { x })
+  }
+
+  applyX(window.scrollY || 0)
+
+  ScrollTrigger.create({
+    start: 0,
+    end: 'max',
+    onUpdate: (self) => {
+      applyX(self.scroll())
+    },
+  })
+
+  window.addEventListener(
+    'resize',
+    () => {
+      applyX(ScrollTrigger.scroll() || window.scrollY || 0)
+    },
+    { passive: true },
+  )
+}
+
 /* ---------- Contact ---------- */
 form?.addEventListener('submit', (event) => {
   event.preventDefault()
@@ -299,6 +333,7 @@ function boot() {
   initHeroIntro()
   initReveals()
   initParallax()
+  initMarqueeScroll()
   initVideoScrub()
 }
 

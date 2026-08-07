@@ -663,7 +663,7 @@ main {
   display: flex;
   width: max-content;
   will-change: transform;
-  animation: marquee-scroll 28s linear infinite;
+  transform: translate3d(0, 0, 0);
 }
 
 .marquee-group {
@@ -682,21 +682,6 @@ main {
 .marquee-group .sep {
   color: var(--teal);
   opacity: 0.7;
-}
-
-@keyframes marquee-scroll {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-  }
 }
 
 /* ========== CHAPTERS ========== */
@@ -1691,10 +1676,6 @@ main {
 
   .form-actions .btn {
     width: 100%;
-  }
-
-  .marquee {
-    display: none;
   }
 
   .chapter {
