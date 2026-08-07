@@ -8,6 +8,8 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matc
 const mobileQuery = window.matchMedia('(max-width: 767px)')
 const pointerQuery = window.matchMedia('(pointer: fine)')
 
+const video = document.getElementById('scroll-video')
+const portrait = document.querySelector('.media-portrait')
 const header = document.querySelector('.site-header')
 const year = document.getElementById('year')
 const navToggle = document.querySelector('.nav-toggle')
@@ -15,7 +17,6 @@ const mobileNav = document.getElementById('mobile-nav')
 const form = document.getElementById('contact-form')
 const formSuccess = document.getElementById('form-success')
 const cursorGlow = document.querySelector('.cursor-glow')
-const poster = document.querySelector('.media-poster')
 
 if (year) year.textContent = String(new Date().getFullYear())
 
@@ -56,6 +57,11 @@ function initLenis() {
   lenis.on('scroll', ScrollTrigger.update)
   gsap.ticker.add((time) => lenis?.raf(time * 1000))
   gsap.ticker.lagSmoothing(0)
+}
+
+function readScroll() {
+  if (lenis && typeof lenis.scroll === 'number') return lenis.scroll
+  return window.scrollY || document.documentElement.scrollTop || 0
 }
 
 /* ---------- Cursor glow ---------- */
@@ -154,7 +160,6 @@ function initParallax() {
   if (reducedMotion || mobileQuery.matches) return
 
   gsap.utils.toArray('.parallax-img').forEach((img) => {
-    // Portrait crop is tight on the face — parallax would clip the head
     if (img.closest('.portrait-frame')) return
 
     gsap.fromTo(
@@ -175,29 +180,97 @@ function initParallax() {
   })
 }
 
-/* ---------- Hero portrait background (scroll-linked) ---------- */
-function initHeroBackground() {
-  if (!poster || reducedMotion) return
+/* ---------- Video scrub + portrait layer ---------- */
+async function prepareVideo() {
+  if (!video) return false
 
-  const apply = (scrollY) => {
-    const y = Math.min(Math.max(Number(scrollY) || 0, 0), 1400)
-    const shiftY = y * 0.03
-    const scale = 1.05 + Math.min(y, 900) * 0.00003
-    poster.style.transform = `translate3d(0, ${shiftY}px, 0) scale(${scale})`
+  video.pause()
+  video.muted = true
+  video.playsInline = true
+
+  try {
+    if (video.readyState < 1) {
+      await new Promise((resolve, reject) => {
+        const onLoaded = () => {
+          cleanup()
+          resolve()
+        }
+        const onError = () => {
+          cleanup()
+          reject(new Error('video failed'))
+        }
+        const cleanup = () => {
+          video.removeEventListener('loadedmetadata', onLoaded)
+          video.removeEventListener('error', onError)
+        }
+        video.addEventListener('loadedmetadata', onLoaded)
+        video.addEventListener('error', onError)
+        video.load()
+      })
+    }
+  } catch {
+    return false
   }
 
-  const readScroll = () => {
-    if (lenis && typeof lenis.scroll === 'number') return lenis.scroll
-    return window.scrollY || document.documentElement.scrollTop || 0
+  try {
+    video.currentTime = 0.01
+  } catch {
+    /* ignore */
   }
 
-  apply(readScroll())
+  return Boolean(video.duration)
+}
+
+function initMediaLayers() {
+  // Portrait stays visible in hero, soft-fades as you scroll so video remains the living background
+  const syncPortrait = (scrollY) => {
+    if (!portrait) return
+    const fadeRange = Math.max(window.innerHeight * 0.95, 500)
+    const progress = Math.min(Math.max(scrollY / fadeRange, 0), 1)
+    const opacity = 1 - progress * 0.92
+    const shiftY = scrollY * 0.035
+    const scale = 1.06 + progress * 0.03
+    portrait.style.opacity = String(opacity)
+    portrait.style.transform = `translate3d(0, ${shiftY}px, 0) scale(${scale})`
+  }
+
+  syncPortrait(readScroll())
 
   if (lenis) {
-    lenis.on('scroll', ({ scroll }) => apply(scroll))
+    lenis.on('scroll', ({ scroll }) => syncPortrait(scroll))
   }
+  window.addEventListener('scroll', () => syncPortrait(readScroll()), { passive: true })
 
-  window.addEventListener('scroll', () => apply(readScroll()), { passive: true })
+  // Video scrub on desktop; on mobile keep poster frame of video paused
+  const enableScrub = Boolean(video) && !reducedMotion && !mobileQuery.matches
+
+  prepareVideo().then((ok) => {
+    if (!ok || !video) return
+
+    if (!enableScrub) {
+      try {
+        video.currentTime = 0
+      } catch {
+        /* ignore */
+      }
+      return
+    }
+
+    const duration = video.duration
+
+    ScrollTrigger.create({
+      trigger: document.documentElement,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.7,
+      onUpdate: (self) => {
+        const t = self.progress * duration
+        if (Number.isFinite(t)) {
+          video.currentTime = Math.min(duration - 0.05, Math.max(0, t))
+        }
+      },
+    })
+  })
 }
 
 /* ---------- Scroll-linked marquee ---------- */
@@ -208,43 +281,27 @@ function initMarqueeScroll() {
   let loop = 1
 
   const measure = () => {
-    // Two identical groups → loop length is half the track
     loop = Math.max(track.scrollWidth / 2, 1)
   }
 
   const applyX = (scrollY) => {
     measure()
-    // Scroll down → move right; scroll up → move left
+    // Scroll down → left; scroll up → right
     let x = Number(scrollY) * -0.7
     x = ((x % loop) + loop) % loop
     track.style.transform = `translate3d(${x}px, 0, 0)`
   }
 
-  const readScroll = () => {
-    if (lenis && typeof lenis.scroll === 'number') return lenis.scroll
-    return window.scrollY || document.documentElement.scrollTop || 0
-  }
-
-  // Wait one frame so layout/fonts resolve scrollWidth
   requestAnimationFrame(() => {
     measure()
     applyX(readScroll())
   })
 
   if (lenis) {
-    lenis.on('scroll', ({ scroll }) => {
-      applyX(scroll)
-    })
+    lenis.on('scroll', ({ scroll }) => applyX(scroll))
   }
 
-  window.addEventListener(
-    'scroll',
-    () => {
-      applyX(readScroll())
-    },
-    { passive: true },
-  )
-
+  window.addEventListener('scroll', () => applyX(readScroll()), { passive: true })
   window.addEventListener(
     'resize',
     () => {
@@ -253,6 +310,62 @@ function initMarqueeScroll() {
     },
     { passive: true },
   )
+}
+
+/* ---------- Premium service cards ---------- */
+function initServiceCards() {
+  const cards = document.querySelectorAll('[data-service]')
+  if (!cards.length) return
+
+  // Entrance
+  if (!reducedMotion) {
+    gsap.from(cards, {
+      opacity: 0,
+      y: 42,
+      duration: 0.95,
+      stagger: 0.1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: '.service-stage',
+        start: 'top 80%',
+        toggleActions: 'play none none none',
+      },
+    })
+  }
+
+  if (reducedMotion || !pointerQuery.matches || mobileQuery.matches) return
+
+  cards.forEach((card) => {
+    const onMove = (event) => {
+      const rect = card.getBoundingClientRect()
+      const px = (event.clientX - rect.left) / rect.width - 0.5
+      const py = (event.clientY - rect.top) / rect.height - 0.5
+      gsap.to(card, {
+        rotateY: px * 6,
+        rotateX: -py * 6,
+        y: -6,
+        transformPerspective: 800,
+        transformOrigin: 'center',
+        duration: 0.35,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      })
+    }
+
+    const onLeave = () => {
+      gsap.to(card, {
+        rotateY: 0,
+        rotateX: 0,
+        y: 0,
+        duration: 0.55,
+        ease: 'power3.out',
+        overwrite: 'auto',
+      })
+    }
+
+    card.addEventListener('pointermove', onMove)
+    card.addEventListener('pointerleave', onLeave)
+  })
 }
 
 /* ---------- Contact ---------- */
@@ -295,7 +408,8 @@ function boot() {
   initReveals()
   initParallax()
   initMarqueeScroll()
-  initHeroBackground()
+  initMediaLayers()
+  initServiceCards()
 }
 
 boot()

@@ -55,12 +55,22 @@
       }
     </script>
   </head>
-  <body class="use-poster">
+  <body class="has-video">
     <a class="skip-link" href="#main">Skip to content</a>
 
     <div class="media-layer" aria-hidden="true">
+      <video
+        id="scroll-video"
+        class="media-video"
+        muted
+        playsinline
+        preload="auto"
+        poster="/brand-hero-reference.webp"
+      >
+        <source src="/brand-scroll-background.mp4" type="video/mp4" />
+      </video>
       <img
-        class="media-poster"
+        class="media-portrait"
         src="/brand-hero-reference.webp"
         alt=""
         width="1920"
@@ -286,6 +296,11 @@
 
       <!-- SERVICES -->
       <section class="chapter chapter-services" id="services">
+        <div class="services-ambient" aria-hidden="true">
+          <span class="orb orb-a"></span>
+          <span class="orb orb-b"></span>
+          <span class="orb orb-c"></span>
+        </div>
         <div class="chapter-inner">
           <header class="chapter-head reveal">
             <p class="eyebrow"><span class="num">03</span> Services</p>
@@ -296,36 +311,72 @@
             </p>
           </header>
 
-          <div class="service-stage reveal-stagger">
-            <article class="service-card">
-              <div class="service-index mono">01</div>
+          <div class="service-stage">
+            <article class="service-card" data-service>
+              <div class="service-top">
+                <span class="service-index mono">01</span>
+                <span class="service-pulse" aria-hidden="true"></span>
+              </div>
               <h3>1-1 coaching</h3>
               <p>Marketing strategy, online market research, and sales conversion management.</p>
-              <div class="service-glow"></div>
+              <div class="service-meta">
+                <span>Strategy</span>
+                <span>Research</span>
+                <span>Conversions</span>
+              </div>
+              <span class="service-line" aria-hidden="true"></span>
+              <span class="service-shine" aria-hidden="true"></span>
             </article>
-            <article class="service-card">
-              <div class="service-index mono">02</div>
+            <article class="service-card" data-service>
+              <div class="service-top">
+                <span class="service-index mono">02</span>
+                <span class="service-pulse" aria-hidden="true"></span>
+              </div>
               <h3>Corporate AI training</h3>
               <p>Train teams to adopt AI quickly in real workflows — efficient, productive, quality-led.</p>
-              <div class="service-glow"></div>
+              <div class="service-meta">
+                <span>Workshops</span>
+                <span>Adoption</span>
+                <span>Agents</span>
+              </div>
+              <span class="service-line" aria-hidden="true"></span>
+              <span class="service-shine" aria-hidden="true"></span>
             </article>
-            <article class="service-card featured">
-              <div class="service-index mono">03</div>
+            <article class="service-card featured" data-service>
+              <div class="service-top">
+                <span class="service-index mono">03</span>
+                <span class="service-pulse" aria-hidden="true"></span>
+              </div>
               <h3>Entrepreneur advisory</h3>
               <p>
                 Creative and decision-making AI, diversification, time and cost optimization,
                 delegation to AI agents, and boards for a full business picture.
               </p>
-              <div class="service-glow"></div>
+              <div class="service-meta">
+                <span>Systems</span>
+                <span>AI boards</span>
+                <span>Growth</span>
+              </div>
+              <span class="service-line" aria-hidden="true"></span>
+              <span class="service-shine" aria-hidden="true"></span>
             </article>
-            <article class="service-card">
-              <div class="service-index mono">04</div>
+            <article class="service-card" data-service>
+              <div class="service-top">
+                <span class="service-index mono">04</span>
+                <span class="service-pulse" aria-hidden="true"></span>
+              </div>
               <h3>Marketing execution</h3>
               <p>
                 Market research, web design, social ads, SEO, AIO, graphics, photo-video,
                 content, copywriting, lead generation.
               </p>
-              <div class="service-glow"></div>
+              <div class="service-meta">
+                <span>SEO / AIO</span>
+                <span>Ads</span>
+                <span>Content</span>
+              </div>
+              <span class="service-line" aria-hidden="true"></span>
+              <span class="service-shine" aria-hidden="true"></span>
             </article>
           </div>
         </div>
