@@ -368,6 +368,79 @@ function initServiceCards() {
   })
 }
 
+/* ---------- Premium scroll timeline ---------- */
+function initTimeline() {
+  const section = document.getElementById('expertise')
+  const timeline = document.querySelector('[data-timeline]')
+  const progress = document.querySelector('[data-timeline-progress]')
+  const items = gsap.utils.toArray('[data-timeline-item]')
+  const ghost = document.querySelector('[data-year-ghost]')
+
+  if (!section || !timeline || !items.length) return
+
+  if (reducedMotion) {
+    items.forEach((item) => item.classList.add('is-active'))
+    if (progress) progress.style.height = '100%'
+    return
+  }
+
+  const activate = (index) => {
+    items.forEach((item, i) => {
+      item.classList.toggle('is-active', i <= index)
+    })
+    const year = items[Math.max(index, 0)]?.dataset.year || '2006'
+    if (ghost) {
+      ghost.textContent = year
+      gsap.fromTo(
+        ghost,
+        { opacity: 0.02, y: 18 },
+        { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out', overwrite: 'auto' },
+      )
+    }
+  }
+
+  items.forEach((item, index) => {
+    ScrollTrigger.create({
+      trigger: item,
+      start: 'top 72%',
+      end: 'bottom 45%',
+      onEnter: () => activate(index),
+      onEnterBack: () => activate(index),
+    })
+  })
+
+  if (progress) {
+    gsap.fromTo(
+      progress,
+      { height: '0%' },
+      {
+        height: '100%',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: timeline,
+          start: 'top 70%',
+          end: 'bottom 35%',
+          scrub: 0.55,
+        },
+      },
+    )
+  }
+
+  // Soft parallax on the ghost year
+  if (ghost) {
+    gsap.to(ghost, {
+      yPercent: 18,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+      },
+    })
+  }
+}
+
 /* ---------- Contact ---------- */
 form?.addEventListener('submit', (event) => {
   event.preventDefault()
@@ -410,6 +483,7 @@ function boot() {
   initMarqueeScroll()
   initMediaLayers()
   initServiceCards()
+  initTimeline()
 }
 
 boot()
