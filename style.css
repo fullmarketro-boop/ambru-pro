@@ -661,26 +661,41 @@ main {
 
 .marquee-track {
   display: flex;
-  gap: 1.4rem;
   width: max-content;
+  will-change: transform;
+  animation: marquee-scroll 28s linear infinite;
+}
+
+.marquee-group {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 1.4rem;
+  padding-right: 1.4rem;
   font-family: var(--font-display);
   font-size: clamp(1.1rem, 2.4vw, 1.55rem);
   font-style: italic;
   color: color-mix(in srgb, var(--mist) 70%, transparent);
-  animation: marquee 32s linear infinite;
+  white-space: nowrap;
 }
 
-.marquee-track .sep {
+.marquee-group .sep {
   color: var(--teal);
   opacity: 0.7;
 }
 
-@keyframes marquee {
+@keyframes marquee-scroll {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
   }
 }
 
@@ -1460,7 +1475,6 @@ main {
 @media (prefers-reduced-motion: reduce) {
   .reveal,
   .reveal-stagger > *,
-  .marquee-track,
   .scroll-line,
   .hero-eyebrow .dot,
   .spine-node.is-live {
