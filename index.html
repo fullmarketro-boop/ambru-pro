@@ -442,69 +442,118 @@
         </div>
       </section>
 
-      <!-- PROCESS + MATERIALS -->
+      <!-- PROCESS -->
       <section class="chapter chapter-process" id="process">
-        <div class="process-layout">
-          <div class="process-visual reveal">
-            <div class="material-stack">
-            <picture>
-              <source srcset="/brand-material-reference.webp" type="image/webp" />
-              <img
-                src="/brand-material-reference.webp"
-                alt="Precision tools and process mapping materials"
-                class="material-main parallax-img"
-                width="1200"
-                height="1200"
-                loading="lazy"
-                decoding="async"
-              />
-            </picture>
-              <div class="material-float">
-                <span class="mono">Materials</span>
-                <p>Systems you can see and measure</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="process-copy reveal">
+        <div class="process-shell">
+          <span class="process-ghost" aria-hidden="true" data-process-ghost>LOOP</span>
+          <header class="chapter-head reveal">
             <p class="eyebrow"><span class="num">04</span> How I work</p>
             <h2>Diagnose → System → Implement → Optimize</h2>
-            <ol class="process-rail">
-              <li>
-                <span class="step-num">01</span>
-                <div>
-                  <h3>Diagnose</h3>
-                  <p>Clarify where time, focus, and conversion are being lost.</p>
-                </div>
-              </li>
-              <li>
-                <span class="step-num">02</span>
-                <div>
-                  <h3>System</h3>
-                  <p>Build priorities, flows, metrics, and AI’s role.</p>
-                </div>
-              </li>
-              <li>
-                <span class="step-num">03</span>
-                <div>
-                  <h3>Implement</h3>
-                  <p>Apply in real processes — not theoretical slide decks.</p>
-                </div>
-              </li>
-              <li>
-                <span class="step-num">04</span>
-                <div>
-                  <h3>Optimize</h3>
-                  <p>Measure, adjust, and transfer skills to you and your team.</p>
-                </div>
-              </li>
-            </ol>
+            <p class="lead">
+              A clear operating loop — not a vague “strategy conversation.”
+            </p>
+          </header>
+
+          <div class="process-board" data-process>
+            <div class="process-flowline" aria-hidden="true">
+              <span class="process-flowline-base"></span>
+              <span class="process-flowline-progress" data-process-progress></span>
+            </div>
+
+            <article class="process-step" data-process-step>
+              <div class="process-step-index">
+                <span class="mono">01</span>
+                <span class="process-dot"></span>
+              </div>
+              <div class="process-step-card">
+                <p class="process-kicker">Signal</p>
+                <h3>Diagnose</h3>
+                <p>Clarify where time, focus, and conversion are being lost.</p>
+                <ul class="process-points">
+                  <li>Leak map</li>
+                  <li>Priority cut</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="process-step" data-process-step>
+              <div class="process-step-index">
+                <span class="mono">02</span>
+                <span class="process-dot"></span>
+              </div>
+              <div class="process-step-card">
+                <p class="process-kicker">Architecture</p>
+                <h3>System</h3>
+                <p>Build priorities, flows, metrics, and AI’s role.</p>
+                <ul class="process-points">
+                  <li>Workflow design</li>
+                  <li>KPI spine</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="process-step" data-process-step>
+              <div class="process-step-index">
+                <span class="mono">03</span>
+                <span class="process-dot"></span>
+              </div>
+              <div class="process-step-card">
+                <p class="process-kicker">Execution</p>
+                <h3>Implement</h3>
+                <p>Apply in real processes — not theoretical slide decks.</p>
+                <ul class="process-points">
+                  <li>Live install</li>
+                  <li>Team enablement</li>
+                </ul>
+              </div>
+            </article>
+
+            <article class="process-step" data-process-step>
+              <div class="process-step-index">
+                <span class="mono">04</span>
+                <span class="process-dot is-live"></span>
+              </div>
+              <div class="process-step-card">
+                <p class="process-kicker">Compounding</p>
+                <h3>Optimize</h3>
+                <p>Measure, adjust, and transfer skills to you and your team.</p>
+                <ul class="process-points">
+                  <li>Feedback loops</li>
+                  <li>Skill transfer</li>
+                </ul>
+              </div>
+            </article>
           </div>
+
+          <aside class="process-proof reveal">
+            <div class="process-proof-media">
+              <picture>
+                <source srcset="/brand-material-reference.webp" type="image/webp" />
+                <img
+                  src="/brand-material-reference.webp"
+                  alt="Precision tools and process mapping materials"
+                  class="parallax-img"
+                  width="1200"
+                  height="1200"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </picture>
+            </div>
+            <div class="process-proof-copy">
+              <span class="mono">Operating principle</span>
+              <p>Systems you can see, measure, and hand over — not locked inside a consultant’s head.</p>
+            </div>
+          </aside>
         </div>
       </section>
 
       <!-- BENEFITS -->
       <section class="chapter chapter-benefits" id="benefits">
+        <div class="benefits-ambient" aria-hidden="true">
+          <span class="benefit-orb benefit-orb-a"></span>
+          <span class="benefit-orb benefit-orb-b"></span>
+        </div>
         <div class="chapter-inner">
           <header class="chapter-head reveal">
             <p class="eyebrow"><span class="num">05</span> Benefits</p>
@@ -512,46 +561,80 @@
             <p class="lead">Operational clarity, stronger conversions, and applied AI — not hype.</p>
           </header>
 
-          <div class="benefit-mosaic reveal-stagger">
-            <article class="benefit-tile large">
-              <span class="mono">01</span>
+          <div class="benefit-bento" data-benefits>
+            <article class="benefit-card benefit-card--hero" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">01</span>
+                <span class="benefit-chip">Core</span>
+              </div>
               <h3>Real, long-term experience</h3>
               <p>Practice since 2006+, not recent theory.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
-            <article class="benefit-tile">
-              <span class="mono">02</span>
+
+            <article class="benefit-card" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">02</span>
+              </div>
               <h3>Time &amp; process optimization</h3>
               <p>Less chaos, more operational control.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
-            <article class="benefit-tile">
-              <span class="mono">03</span>
+
+            <article class="benefit-card" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">03</span>
+              </div>
               <h3>Conversion-focused marketing</h3>
               <p>From visibility to leads and sales.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
-            <article class="benefit-tile accent">
-              <span class="mono">04</span>
+
+            <article class="benefit-card benefit-card--accent" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">04</span>
+                <span class="benefit-chip live">Signal</span>
+              </div>
               <h3>AI applied in business</h3>
               <p>Fast adoption inside real work streams.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
-            <article class="benefit-tile">
-              <span class="mono">05</span>
+
+            <article class="benefit-card" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">05</span>
+              </div>
               <h3>Full-picture vision</h3>
               <p>Research + strategy + execution + systems.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
-            <article class="benefit-tile">
-              <span class="mono">06</span>
+
+            <article class="benefit-card" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">06</span>
+              </div>
               <h3>Skill transfer</h3>
               <p>Coaching and training, not permanent dependency.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
-            <article class="benefit-tile">
-              <span class="mono">07</span>
+
+            <article class="benefit-card" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">07</span>
+              </div>
               <h3>Clearer decisions</h3>
               <p>Market studies and boards for the complete view.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
-            <article class="benefit-tile large">
-              <span class="mono">08</span>
+
+            <article class="benefit-card benefit-card--wide" data-benefit>
+              <div class="benefit-card-top">
+                <span class="mono">08</span>
+                <span class="benefit-chip">Outcome</span>
+              </div>
               <h3>Diversification &amp; efficiency</h3>
               <p>Growth in more directions, better cost control.</p>
+              <div class="benefit-meter" aria-hidden="true"><span></span></div>
             </article>
           </div>
         </div>

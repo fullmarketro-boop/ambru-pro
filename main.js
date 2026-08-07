@@ -441,6 +441,172 @@ function initTimeline() {
   }
 }
 
+/* ---------- Premium process loop ---------- */
+function initProcess() {
+  const board = document.querySelector('[data-process]')
+  const progress = document.querySelector('[data-process-progress]')
+  const steps = gsap.utils.toArray('[data-process-step]')
+  const ghost = document.querySelector('[data-process-ghost]')
+
+  if (!board || !steps.length) return
+
+  if (reducedMotion) {
+    steps.forEach((step) => step.classList.add('is-active'))
+    if (progress) {
+      progress.style.width = '100%'
+      progress.style.height = '100%'
+    }
+    return
+  }
+
+  const activate = (index) => {
+    steps.forEach((step, i) => {
+      step.classList.toggle('is-active', i <= index)
+    })
+  }
+
+  steps.forEach((step, index) => {
+    ScrollTrigger.create({
+      trigger: step,
+      start: 'top 78%',
+      end: 'bottom 40%',
+      onEnter: () => activate(index),
+      onEnterBack: () => activate(index),
+    })
+  })
+
+  if (progress) {
+    const desktop = window.matchMedia('(min-width: 900px)')
+    let progressTween
+
+    const applyProgress = () => {
+      progressTween?.scrollTrigger?.kill()
+      progressTween?.kill()
+
+      if (desktop.matches) {
+        gsap.set(progress, { height: '100%', width: '0%' })
+        progressTween = gsap.to(progress, {
+          width: '100%',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: board,
+            start: 'top 70%',
+            end: 'bottom 40%',
+            scrub: 0.55,
+          },
+        })
+      } else {
+        gsap.set(progress, { width: '100%', height: '0%' })
+        progressTween = gsap.to(progress, {
+          height: '100%',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: board,
+            start: 'top 70%',
+            end: 'bottom 40%',
+            scrub: 0.55,
+          },
+        })
+      }
+    }
+
+    applyProgress()
+    desktop.addEventListener('change', applyProgress)
+  }
+
+  if (ghost) {
+    gsap.to(ghost, {
+      yPercent: 12,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '#process',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+      },
+    })
+  }
+}
+
+/* ---------- Premium benefits bento ---------- */
+function initBenefits() {
+  const cards = gsap.utils.toArray('[data-benefit]')
+  if (!cards.length) return
+
+  const meterTargets = [92, 78, 84, 90, 76, 88, 74, 86]
+
+  if (reducedMotion) {
+    cards.forEach((card, index) => {
+      const meter = card.querySelector('.benefit-meter span')
+      if (meter) meter.style.width = `${meterTargets[index] || 80}%`
+    })
+    return
+  }
+
+  cards.forEach((card, index) => {
+    const meter = card.querySelector('.benefit-meter span')
+
+    gsap.from(card, {
+      opacity: 0,
+      y: 28,
+      duration: 0.85,
+      delay: (index % 4) * 0.06,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: card,
+        start: 'top 88%',
+        toggleActions: 'play none none none',
+        onEnter: () => {
+          card.classList.add('is-lit')
+          if (meter) {
+            gsap.to(meter, {
+              width: `${meterTargets[index] || 80}%`,
+              duration: 1.05,
+              ease: 'power3.out',
+              overwrite: 'auto',
+            })
+          }
+          window.setTimeout(() => card.classList.remove('is-lit'), 1000)
+        },
+      },
+    })
+  })
+
+  if (!pointerQuery.matches || mobileQuery.matches) return
+
+  cards.forEach((card) => {
+    const onMove = (event) => {
+      const rect = card.getBoundingClientRect()
+      const px = (event.clientX - rect.left) / rect.width - 0.5
+      const py = (event.clientY - rect.top) / rect.height - 0.5
+      gsap.to(card, {
+        rotateY: px * 5,
+        rotateX: -py * 5,
+        y: -5,
+        transformPerspective: 900,
+        transformOrigin: 'center',
+        duration: 0.35,
+        ease: 'power2.out',
+        overwrite: 'auto',
+      })
+    }
+
+    const onLeave = () => {
+      gsap.to(card, {
+        rotateY: 0,
+        rotateX: 0,
+        y: 0,
+        duration: 0.55,
+        ease: 'power3.out',
+        overwrite: 'auto',
+      })
+    }
+
+    card.addEventListener('pointermove', onMove)
+    card.addEventListener('pointerleave', onLeave)
+  })
+}
+
 /* ---------- Contact ---------- */
 form?.addEventListener('submit', (event) => {
   event.preventDefault()
@@ -484,6 +650,8 @@ function boot() {
   initMediaLayers()
   initServiceCards()
   initTimeline()
+  initProcess()
+  initBenefits()
 }
 
 boot()

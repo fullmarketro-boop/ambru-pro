@@ -8,3 +8,5 @@ dist
 # Heavy source media kept locally — site uses public/*.webp + public videos
 /*.png
 /brand-scroll-background*.mp4
+
+.vercel

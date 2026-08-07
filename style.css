@@ -1292,138 +1292,480 @@ main {
   }
 }
 
-/* Process */
+/* Process — premium operating loop */
 .chapter-process {
-  background: var(--ink);
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(31, 166, 160, 0.1), transparent 40%),
+    linear-gradient(180deg, #07151c, #0b1f2a 55%, #07151c);
 }
 
-.process-layout {
+.chapter-process .chapter-head h2 {
+  color: var(--white);
+  max-width: 22ch;
+}
+
+.chapter-process .chapter-head .lead {
+  color: color-mix(in srgb, var(--mist) 78%, var(--fog));
+}
+
+.process-shell {
+  position: relative;
   width: var(--content);
   margin: 0 auto;
-  display: grid;
-  gap: 2.5rem;
-  align-items: center;
 }
 
-.material-stack {
-  position: relative;
-}
-
-.material-main {
-  width: 100%;
-  border-radius: var(--radius);
-  aspect-ratio: 1;
-  object-fit: cover;
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
-}
-
-.material-float {
+.process-ghost {
   position: absolute;
-  left: 1rem;
-  bottom: 1rem;
-  right: 1rem;
-  padding: 1rem 1.15rem;
-  border-radius: var(--radius-sm);
-  background: rgba(7, 21, 28, 0.72);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(232, 238, 241, 0.1);
+  right: -2%;
+  top: 8%;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 14vw, 11rem);
+  font-weight: 500;
+  letter-spacing: -0.06em;
+  line-height: 0.85;
+  color: rgba(232, 238, 241, 0.035);
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
 }
 
-.material-float p {
-  margin: 0.35rem 0 0;
-  color: var(--white);
-  font-size: 0.95rem;
-}
-
-.process-rail {
+.process-board {
+  position: relative;
+  z-index: 1;
   display: grid;
-  gap: 0.85rem;
-  margin-top: 2rem;
-}
-
-.process-rail li {
-  display: grid;
-  grid-template-columns: 3rem 1fr;
   gap: 1rem;
-  padding: 1.1rem 1.15rem;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(232, 238, 241, 0.08);
+  margin-top: var(--space-7);
+}
+
+.process-flowline {
+  display: block;
+  position: absolute;
+  left: 1.35rem;
+  top: 2.1rem;
+  bottom: 2.1rem;
+  width: 2px;
+  z-index: 0;
+}
+
+.process-flowline-base,
+.process-flowline-progress {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+}
+
+.process-flowline-base {
+  background: rgba(232, 238, 241, 0.12);
+}
+
+.process-flowline-progress {
+  height: 0%;
+  width: 100%;
+  background: linear-gradient(180deg, var(--teal), color-mix(in srgb, var(--teal) 20%, transparent));
+  box-shadow: 0 0 16px rgba(31, 166, 160, 0.35);
+}
+
+.process-step {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 3.2rem 1fr;
+  gap: 0.9rem;
+  opacity: 0.42;
+  transform: translate3d(0, 24px, 0);
+  transition: opacity 0.45s var(--ease-enter), transform 0.55s var(--ease-enter);
+}
+
+.process-step.is-active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+.process-step-index {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.65rem;
+  padding-top: 1.25rem;
+}
+
+.process-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 50%;
+  background: var(--ink-900);
+  border: 2px solid color-mix(in srgb, var(--teal) 50%, var(--fog));
+  box-shadow: 0 0 0 4px rgba(31, 166, 160, 0.08);
+  transition: transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+}
+
+.process-step.is-active .process-dot {
+  background: var(--teal);
+  border-color: var(--teal);
+  transform: scale(1.2);
+  box-shadow: 0 0 0 6px rgba(31, 166, 160, 0.16), 0 0 20px rgba(31, 166, 160, 0.3);
+}
+
+.process-dot.is-live {
+  animation: livePulse 2.2s ease-out infinite;
+}
+
+.process-step-card {
+  position: relative;
+  overflow: hidden;
+  padding: 1.25rem 1.3rem 1.35rem;
+  border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.03);
-  transition: border-color 0.3s ease, background 0.3s ease;
+  border: 1px solid rgba(232, 238, 241, 0.08);
+  backdrop-filter: blur(12px);
+  transition: border-color 0.35s ease, background 0.35s ease, box-shadow 0.45s ease, transform 0.45s var(--ease-enter);
 }
 
-.process-rail li:hover {
-  border-color: color-mix(in srgb, var(--teal) 40%, transparent);
-  background: rgba(31, 166, 160, 0.06);
+.process-step.is-active .process-step-card {
+  border-color: color-mix(in srgb, var(--teal) 35%, transparent);
+  background: rgba(31, 166, 160, 0.07);
+  box-shadow: var(--shadow-md);
 }
 
-.step-num {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
+.process-step-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.08) 50%, transparent 70%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.process-step.is-active .process-step-card::before {
+  animation: cardShine 1s var(--ease-enter);
+}
+
+.process-kicker {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
   color: var(--teal);
-  padding-top: 0.15rem;
 }
 
-.process-rail h3 {
+.process-step-card h3 {
   color: var(--white);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
 }
 
-.process-rail p {
-  color: color-mix(in srgb, var(--mist) 72%, var(--fog));
-  font-size: 0.95rem;
+.process-step-card p {
+  color: color-mix(in srgb, var(--mist) 74%, var(--fog));
+  margin-bottom: 0.9rem;
+  max-width: 34rem;
 }
 
-/* Benefits mosaic */
+.process-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.process-points li {
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--mist) 70%, var(--fog));
+  padding: 0.28rem 0.55rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(232, 238, 241, 0.1);
+  background: rgba(7, 21, 28, 0.35);
+}
+
+.process-proof {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--space-8);
+  display: grid;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.process-proof-media {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.process-proof-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 40%, rgba(31, 166, 160, 0.18), transparent 70%);
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.process-proof-media img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+}
+
+.process-proof-copy {
+  padding: 1.35rem 1.45rem;
+  border-radius: var(--radius);
+  border: 1px solid rgba(232, 238, 241, 0.1);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.process-proof-copy p {
+  margin-top: 0.55rem;
+  color: var(--mist);
+  max-width: 36rem;
+  font-size: clamp(1.05rem, 2vw, 1.22rem);
+  line-height: 1.45;
+}
+
+@media (min-width: 900px) {
+  .process-board {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    padding-top: 0.35rem;
+  }
+
+  .process-flowline {
+    left: 8%;
+    right: 8%;
+    top: 0.95rem;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+  }
+
+  .process-flowline-progress {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), color-mix(in srgb, var(--teal) 25%, transparent));
+  }
+
+  .process-step {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
+    text-align: left;
+  }
+
+  .process-step-index {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+    padding-top: 0;
+    margin-bottom: 1rem;
+  }
+
+  .process-step-index .mono {
+    order: 2;
+    font-size: 0.72rem;
+  }
+
+  .process-dot {
+    order: 1;
+  }
+
+  .process-step.is-active .process-step-card {
+    transform: translateY(-6px);
+  }
+
+  .process-proof {
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+}
+
+/* Benefits — intelligent bento */
 .chapter-benefits {
-  background: linear-gradient(180deg, #e8eef1, #f4f7f8);
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 90% 10%, rgba(31, 166, 160, 0.08), transparent 35%),
+    linear-gradient(180deg, #e8eef1, #f4f7f8);
   color: var(--graphite);
 }
 
-.benefit-mosaic {
+.benefits-ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.benefit-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(42px);
+  opacity: 0.5;
+  animation: orbFloat 14s ease-in-out infinite;
+}
+
+.benefit-orb-a {
+  width: 16rem;
+  height: 16rem;
+  left: -3rem;
+  top: 20%;
+  background: rgba(31, 166, 160, 0.22);
+}
+
+.benefit-orb-b {
+  width: 18rem;
+  height: 18rem;
+  right: -4rem;
+  bottom: 10%;
+  background: rgba(31, 58, 74, 0.14);
+  animation-delay: -5s;
+}
+
+.benefit-bento {
+  position: relative;
+  z-index: 1;
   display: grid;
   gap: 0.9rem;
 }
 
-.benefit-tile {
-  padding: 1.45rem 1.35rem;
+.benefit-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 11rem;
+  padding: 1.4rem 1.35rem 1.45rem;
   border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(11, 31, 42, 0.07);
-  min-height: 10rem;
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(11, 31, 42, 0.08);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  transition: transform 0.35s var(--ease), box-shadow 0.35s ease;
+  transition: border-color 0.35s ease, box-shadow 0.45s ease;
+  will-change: transform;
 }
 
-.benefit-tile:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 40px rgba(11, 31, 42, 0.08);
+.benefit-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.45) 50%, transparent 65%);
+  transform: translateX(-130%);
+  pointer-events: none;
 }
 
-.benefit-tile .mono {
-  margin-bottom: auto;
-  padding-bottom: 1.5rem;
+.benefit-card.is-lit::after {
+  animation: cardShine 0.95s var(--ease-enter);
 }
 
-.benefit-tile p {
+.benefit-card:hover {
+  border-color: color-mix(in srgb, var(--teal) 35%, transparent);
+  box-shadow: var(--shadow-md);
+}
+
+.benefit-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.1rem;
+}
+
+.benefit-chip {
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.5rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(11, 31, 42, 0.1);
+  color: var(--slate);
+}
+
+.benefit-chip.live {
+  background: var(--teal);
+  border-color: transparent;
+  color: var(--ink-deep);
+}
+
+.benefit-card h3 {
+  margin-bottom: 0.4rem;
+}
+
+.benefit-card p {
   color: color-mix(in srgb, var(--graphite) 80%, var(--fog));
-  font-size: 0.95rem;
+  margin-bottom: 1rem;
 }
 
-.benefit-tile.accent {
-  background: linear-gradient(160deg, #0b1f2a, #1f3a4a);
+.benefit-meter {
+  margin-top: auto;
+  height: 2px;
+  width: 100%;
+  background: rgba(11, 31, 42, 0.08);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.benefit-meter span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), color-mix(in srgb, var(--teal) 20%, transparent));
+  border-radius: inherit;
+}
+
+.benefit-card--hero {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(232, 238, 241, 0.9));
+  min-height: 14rem;
+}
+
+.benefit-card--accent {
+  background: linear-gradient(155deg, #0b1f2a, #1f3a4a);
   color: var(--mist);
   border-color: transparent;
 }
 
-.benefit-tile.accent h3 {
+.benefit-card--accent h3 {
   color: var(--white);
 }
 
-.benefit-tile.accent p {
+.benefit-card--accent p {
   color: color-mix(in srgb, var(--mist) 75%, var(--fog));
+}
+
+.benefit-card--accent .benefit-meter {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.benefit-card--accent .benefit-chip:not(.live) {
+  color: var(--mist);
+  border-color: rgba(232, 238, 241, 0.16);
+}
+
+@media (min-width: 768px) {
+  .benefit-bento {
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .benefit-card {
+    grid-column: span 4;
+  }
+
+  .benefit-card--hero {
+    grid-column: span 8;
+  }
+
+  .benefit-card--accent {
+    grid-column: span 4;
+  }
+
+  .benefit-card--wide {
+    grid-column: span 8;
+  }
 }
 
 /* Credentials */
