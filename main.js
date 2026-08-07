@@ -175,88 +175,40 @@ function initParallax() {
   })
 }
 
-/* ---------- Video scrub ---------- */
-function canUseVideoScrub() {
-  return Boolean(video) && !reducedMotion && !mobileQuery.matches
-}
+/* ---------- Hero portrait background (scroll-linked) ---------- */
+function initHeroBackground() {
+  // Always show the portrait photo — not the empty-room video
+  setPosterMode(true)
 
-function setPosterMode(on) {
-  document.body.classList.toggle('use-poster', on)
-  document.body.classList.toggle('has-video', !on)
-}
+  const poster = document.querySelector('.media-poster')
+  if (!poster || reducedMotion) return
 
-async function prepareVideo() {
-  if (!video) {
-    setPosterMode(true)
-    return false
+  const apply = (scrollY) => {
+    const y = Math.min(Number(scrollY) || 0, 1200)
+    // Subtle drift so the portrait background feels alive while scrolling
+    const shiftY = y * 0.04
+    const scale = 1.06 + Math.min(y, 800) * 0.00004
+    poster.style.transform = `translate3d(0, ${shiftY}px, 0) scale(${scale})`
+    // Keep face in frame: locked toward left-top of the wide hero shot
+    poster.style.objectPosition = '28% 12%'
   }
 
-  video.pause()
-  video.muted = true
-  video.playsInline = true
-
-  try {
-    if (video.readyState < 1) {
-      await new Promise((resolve, reject) => {
-        const onLoaded = () => {
-          cleanup()
-          resolve()
-        }
-        const onError = () => {
-          cleanup()
-          reject(new Error('video failed'))
-        }
-        const cleanup = () => {
-          video.removeEventListener('loadedmetadata', onLoaded)
-          video.removeEventListener('error', onError)
-        }
-        video.addEventListener('loadedmetadata', onLoaded)
-        video.addEventListener('error', onError)
-        video.load()
-      })
-    }
-  } catch {
-    setPosterMode(true)
-    return false
+  const readScroll = () => {
+    if (lenis && typeof lenis.scroll === 'number') return lenis.scroll
+    return window.scrollY || document.documentElement.scrollTop || 0
   }
 
-  try {
-    video.currentTime = 0.01
-  } catch {
-    /* ignore */
+  apply(readScroll())
+
+  if (lenis) {
+    lenis.on('scroll', ({ scroll }) => apply(scroll))
   }
 
-  return Boolean(video.duration)
-}
-
-function initVideoScrub() {
-  if (!canUseVideoScrub()) {
-    setPosterMode(true)
-    return
-  }
-
-  prepareVideo().then((ok) => {
-    if (!ok) {
-      setPosterMode(true)
-      return
-    }
-
-    setPosterMode(false)
-    const duration = video.duration
-
-    ScrollTrigger.create({
-      trigger: document.documentElement,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 0.65,
-      onUpdate: (self) => {
-        const t = self.progress * duration
-        if (Number.isFinite(t)) {
-          video.currentTime = Math.min(duration - 0.05, Math.max(0, t))
-        }
-      },
-    })
-  })
+  window.addEventListener(
+    'scroll',
+    () => apply(readScroll()),
+    { passive: true },
+  )
 }
 
 /* ---------- Scroll-linked marquee ---------- */
@@ -274,7 +226,7 @@ function initMarqueeScroll() {
   const applyX = (scrollY) => {
     measure()
     // Scroll down → move right; scroll up → move left
-    let x = Number(scrollY) * 0.7
+    let x = Number(scrollY) * -0.7
     x = ((x % loop) + loop) % loop
     track.style.transform = `translate3d(${x}px, 0, 0)`
   }
@@ -355,7 +307,12 @@ function boot() {
   initReveals()
   initParallax()
   initMarqueeScroll()
-  initVideoScrub()
+  initHeroBackground()
+}
+
+function setPosterMode(on) {
+  document.body.classList.toggle('use-poster', on)
+  document.body.classList.toggle('has-video', !on)
 }
 
 boot()
