@@ -525,24 +525,67 @@
             </article>
           </div>
 
-          <aside class="process-proof reveal">
-            <div class="process-proof-media">
+          <aside class="process-proof" data-process-proof>
+            <div class="process-proof-media" data-proof-media>
               <picture>
                 <source srcset="/brand-material-reference.webp" type="image/webp" />
                 <img
                   src="/brand-material-reference.webp"
                   alt="Precision tools and process mapping materials"
                   class="parallax-img"
+                  data-proof-img
                   width="1200"
                   height="1200"
                   loading="lazy"
                   decoding="async"
                 />
               </picture>
+              <span class="proof-scan" aria-hidden="true" data-proof-scan></span>
+              <div class="proof-hud" aria-hidden="true">
+                <span class="proof-hud-pill" data-proof-hud>Visible</span>
+                <span class="proof-hud-pill" data-proof-hud>Measurable</span>
+                <span class="proof-hud-pill" data-proof-hud>Transferable</span>
+              </div>
+              <div class="proof-ring" aria-hidden="true" data-proof-ring></div>
             </div>
-            <div class="process-proof-copy">
-              <span class="mono">Operating principle</span>
-              <p>Systems you can see, measure, and hand over — not locked inside a consultant’s head.</p>
+
+            <div class="process-proof-copy" data-proof-copy>
+              <div class="proof-copy-top">
+                <span class="mono">Operating principle</span>
+                <span class="proof-status" data-proof-status>
+                  <span class="proof-status-dot"></span>
+                  Live transfer
+                </span>
+              </div>
+
+              <p class="proof-statement">
+                Systems you can
+                <span class="proof-verb" data-proof-verb="see">see</span>,
+                <span class="proof-verb" data-proof-verb="measure">measure</span>,
+                and
+                <span class="proof-verb" data-proof-verb="handover">hand over</span>
+                — not locked inside a consultant’s head.
+              </p>
+
+              <div class="proof-transfer" aria-hidden="true">
+                <div class="proof-transfer-track">
+                  <span class="proof-transfer-fill" data-proof-fill></span>
+                  <span class="proof-transfer-node is-start"></span>
+                  <span class="proof-transfer-node is-mid"></span>
+                  <span class="proof-transfer-node is-end" data-proof-end></span>
+                </div>
+                <div class="proof-transfer-labels">
+                  <span>Consultant</span>
+                  <span>System</span>
+                  <span>You</span>
+                </div>
+              </div>
+
+              <ul class="proof-chips">
+                <li data-proof-chip>See</li>
+                <li data-proof-chip>Measure</li>
+                <li data-proof-chip>Hand over</li>
+              </ul>
             </div>
           </aside>
         </div>

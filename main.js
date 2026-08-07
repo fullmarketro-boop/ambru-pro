@@ -450,6 +450,8 @@ function initProcess() {
 
   if (!board || !steps.length) return
 
+  initProcessProof()
+
   if (reducedMotion) {
     steps.forEach((step) => step.classList.add('is-active'))
     if (progress) {
@@ -526,6 +528,155 @@ function initProcess() {
       },
     })
   }
+}
+
+/* ---------- Spectacular operating principle ---------- */
+function initProcessProof() {
+  const proof = document.querySelector('[data-process-proof]')
+  if (!proof) return
+
+  const media = proof.querySelector('[data-proof-media]')
+  const img = proof.querySelector('[data-proof-img]')
+  const scan = proof.querySelector('[data-proof-scan]')
+  const ring = proof.querySelector('[data-proof-ring]')
+  const fill = proof.querySelector('[data-proof-fill]')
+  const verbs = gsap.utils.toArray('[data-proof-verb]', proof)
+  const chips = gsap.utils.toArray('[data-proof-chip]', proof)
+  const huds = gsap.utils.toArray('[data-proof-hud]', proof)
+  const nodes = gsap.utils.toArray('.proof-transfer-node', proof)
+
+  if (reducedMotion) {
+    proof.classList.add('is-lit')
+    verbs.forEach((el) => el.classList.add('is-on'))
+    chips.forEach((el) => el.classList.add('is-on'))
+    huds.forEach((el) => el.classList.add('is-on'))
+    nodes.forEach((el) => el.classList.add('is-on'))
+    if (fill) fill.style.width = '100%'
+    return
+  }
+
+  const setStage = (stage) => {
+    verbs.forEach((el, i) => el.classList.toggle('is-on', i <= stage))
+    chips.forEach((el, i) => el.classList.toggle('is-on', i <= stage))
+    huds.forEach((el, i) => el.classList.toggle('is-on', i <= stage))
+    nodes.forEach((el, i) => el.classList.toggle('is-on', i <= stage + 1))
+  }
+
+  ScrollTrigger.create({
+    trigger: proof,
+    start: 'top 82%',
+    onEnter: () => proof.classList.add('is-lit'),
+    onLeaveBack: () => {
+      proof.classList.remove('is-lit')
+      setStage(-1)
+    },
+  })
+
+  // Stage the three verbs as the panel crosses the viewport
+  ;[0, 1, 2].forEach((stage) => {
+    ScrollTrigger.create({
+      trigger: proof,
+      start: `top ${72 - stage * 10}%`,
+      end: 'bottom 35%',
+      onEnter: () => setStage(stage),
+      onEnterBack: () => setStage(stage),
+    })
+  })
+
+  if (fill) {
+    gsap.fromTo(
+      fill,
+      { width: '0%' },
+      {
+        width: '100%',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: proof,
+          start: 'top 75%',
+          end: 'center 40%',
+          scrub: 0.6,
+        },
+      },
+    )
+  }
+
+  if (img) {
+    gsap.fromTo(
+      img,
+      { scale: 1.14, yPercent: -4 },
+      {
+        scale: 1.02,
+        yPercent: 3,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: proof,
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: true,
+        },
+      },
+    )
+  }
+
+  if (scan) {
+    gsap.fromTo(
+      scan,
+      { x: '-30%', opacity: 0 },
+      {
+        x: '320%',
+        opacity: 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: proof,
+          start: 'top 80%',
+          end: 'center 35%',
+          scrub: 0.4,
+        },
+      },
+    )
+  }
+
+  if (ring) {
+    gsap.fromTo(
+      ring,
+      { opacity: 0, scale: 0.7, rotate: -20 },
+      {
+        opacity: 0.9,
+        scale: 1,
+        rotate: 0,
+        duration: 1.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: media || proof,
+          start: 'top 78%',
+          toggleActions: 'play none none reverse',
+        },
+      },
+    )
+
+    gsap.to(ring, {
+      rotate: 120,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: proof,
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: true,
+      },
+    })
+  }
+
+  gsap.from(proof.querySelector('[data-proof-copy]'), {
+    opacity: 0,
+    y: 36,
+    duration: 0.95,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: proof,
+      start: 'top 84%',
+      toggleActions: 'play none none reverse',
+    },
+  })
 }
 
 /* ---------- Premium benefits bento ---------- */

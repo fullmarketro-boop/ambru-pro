@@ -1487,6 +1487,22 @@ main {
   display: grid;
   gap: 1rem;
   align-items: stretch;
+  isolation: isolate;
+}
+
+.process-proof::before {
+  content: "";
+  position: absolute;
+  inset: -8% -4%;
+  background: radial-gradient(ellipse at 30% 50%, rgba(31, 166, 160, 0.16), transparent 55%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.8s ease;
+}
+
+.process-proof.is-lit::before {
+  opacity: 1;
 }
 
 .process-proof-media {
@@ -1494,40 +1510,334 @@ main {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
+  min-height: 16rem;
+  background: #07151c;
 }
 
 .process-proof-media::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent 40%, rgba(31, 166, 160, 0.18), transparent 70%);
-  mix-blend-mode: soft-light;
+  background:
+    linear-gradient(180deg, rgba(7, 21, 28, 0.15), rgba(7, 21, 28, 0.55)),
+    linear-gradient(120deg, transparent 40%, rgba(31, 166, 160, 0.22), transparent 70%);
   pointer-events: none;
+  z-index: 1;
 }
 
 .process-proof-media img {
   width: 100%;
+  height: 100%;
   aspect-ratio: 16 / 10;
   object-fit: cover;
+  transform: scale(1.08);
+  will-change: transform;
+}
+
+.proof-scan {
+  position: absolute;
+  left: -10%;
+  top: 0;
+  width: 28%;
+  height: 100%;
+  z-index: 2;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(31, 166, 160, 0.08),
+    rgba(232, 238, 241, 0.28),
+    rgba(31, 166, 160, 0.08),
+    transparent
+  );
+  transform: translateX(-40%);
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.proof-hud {
+  position: absolute;
+  left: 1rem;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.proof-hud-pill {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(232, 238, 241, 0.2);
+  background: rgba(7, 21, 28, 0.72);
+  color: color-mix(in srgb, var(--mist) 78%, var(--fog));
+  backdrop-filter: blur(12px);
+  opacity: 0.4;
+  transform: translateY(8px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.45s var(--ease-enter),
+    border-color 0.35s ease,
+    color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.proof-hud-pill.is-on {
+  opacity: 1;
+  transform: translateY(0);
+  color: var(--ink-deep);
+  background: var(--teal);
+  border-color: transparent;
+  box-shadow: 0 0 18px rgba(31, 166, 160, 0.35);
+}
+
+.proof-ring {
+  position: absolute;
+  right: 8%;
+  top: 12%;
+  width: 5.5rem;
+  height: 5.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(31, 166, 160, 0.35);
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.proof-ring::before,
+.proof-ring::after {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  border: 1px solid rgba(31, 166, 160, 0.25);
+}
+
+.proof-ring::after {
+  inset: 34%;
+  background: rgba(31, 166, 160, 0.18);
+  border: none;
+  box-shadow: 0 0 24px rgba(31, 166, 160, 0.35);
 }
 
 .process-proof-copy {
-  padding: 1.35rem 1.45rem;
+  position: relative;
+  overflow: hidden;
+  padding: 1.55rem 1.5rem 1.65rem;
   border-radius: var(--radius);
   border: 1px solid rgba(232, 238, 241, 0.1);
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
+  background:
+    linear-gradient(155deg, rgba(31, 166, 160, 0.1), transparent 42%),
+    rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(14px);
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 1.15rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
-.process-proof-copy p {
-  margin-top: 0.55rem;
-  color: var(--mist);
-  max-width: 36rem;
-  font-size: clamp(1.05rem, 2vw, 1.22rem);
-  line-height: 1.45;
+.process-proof-copy::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.07) 50%, transparent 60%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.process-proof.is-lit .process-proof-copy::before {
+  animation: cardShine 1.15s var(--ease-enter);
+}
+
+.proof-copy-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.proof-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--mist) 72%, var(--fog));
+  opacity: 0.55;
+  transition: opacity 0.4s ease, color 0.4s ease;
+}
+
+.process-proof.is-lit .proof-status {
+  opacity: 1;
+  color: var(--teal);
+}
+
+.proof-status-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background: var(--teal);
+  box-shadow: 0 0 0 0 rgba(31, 166, 160, 0.45);
+}
+
+.process-proof.is-lit .proof-status-dot {
+  animation: livePulse 2s ease-out infinite;
+}
+
+.proof-statement {
+  margin: 0;
+  color: color-mix(in srgb, var(--mist) 82%, var(--fog));
+  max-width: 28rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.28rem, 2.5vw, 1.7rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.28;
+  text-wrap: pretty;
+}
+
+.proof-verb {
+  position: relative;
+  display: inline-block;
+  color: color-mix(in srgb, var(--mist) 70%, var(--fog));
+  transition: color 0.35s ease, text-shadow 0.35s ease;
+}
+
+.proof-verb::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.08em;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: var(--teal);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-enter);
+}
+
+.proof-verb.is-on {
+  color: var(--white);
+  text-shadow: 0 0 24px rgba(31, 166, 160, 0.35);
+}
+
+.proof-verb.is-on::after {
+  transform: scaleX(1);
+}
+
+.proof-transfer {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.proof-transfer-track {
+  position: relative;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: rgba(232, 238, 241, 0.12);
+  overflow: visible;
+}
+
+.proof-transfer-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--teal), color-mix(in srgb, var(--teal) 30%, transparent));
+  box-shadow: 0 0 14px rgba(31, 166, 160, 0.4);
+}
+
+.proof-transfer-node {
+  position: absolute;
+  top: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--ink-900);
+  border: 2px solid color-mix(in srgb, var(--teal) 45%, var(--fog));
+  transform: translate(-50%, -50%);
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+}
+
+.proof-transfer-node.is-start {
+  left: 0%;
+}
+
+.proof-transfer-node.is-mid {
+  left: 50%;
+}
+
+.proof-transfer-node.is-end {
+  left: 100%;
+}
+
+.proof-transfer-node.is-on {
+  background: var(--teal);
+  border-color: var(--teal);
+  transform: translate(-50%, -50%) scale(1.25);
+  box-shadow: 0 0 0 5px rgba(31, 166, 160, 0.16), 0 0 16px rgba(31, 166, 160, 0.4);
+}
+
+.proof-transfer-node.is-end.is-on {
+  animation: livePulse 1.8s ease-out infinite;
+}
+
+.proof-transfer-labels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--mist) 58%, var(--fog));
+}
+
+.proof-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.proof-chips li {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(232, 238, 241, 0.12);
+  color: color-mix(in srgb, var(--mist) 65%, var(--fog));
+  background: rgba(7, 21, 28, 0.35);
+  opacity: 0.45;
+  transition:
+    opacity 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    background 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s var(--ease-enter);
+}
+
+.proof-chips li.is-on {
+  opacity: 1;
+  color: var(--ink-deep);
+  background: var(--teal);
+  border-color: transparent;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(31, 166, 160, 0.25);
 }
 
 @media (min-width: 900px) {
