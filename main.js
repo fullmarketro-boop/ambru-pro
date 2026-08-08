@@ -273,43 +273,90 @@ function initMediaLayers() {
   })
 }
 
-/* ---------- Scroll-linked marquee ---------- */
+/* ---------- Continuous marquee (scroll boosts / reverses) ---------- */
 function initMarqueeScroll() {
   const track = document.querySelector('.marquee-track')
   if (!track) return
 
+  if (reducedMotion) return
+
   let loop = 1
+  let x = 0
+  let direction = -1 // -1 = left, 1 = right
+  let boost = 0
+  let lastScroll = readScroll()
+
+  const baseSpeed = 42 // px/sec constant cruise
+  const boostDecay = 0.92
+  const boostGain = 2.4
+  const boostMax = 220
 
   const measure = () => {
     loop = Math.max(track.scrollWidth / 2, 1)
   }
 
-  const applyX = (scrollY) => {
-    measure()
-    // Scroll down → left; scroll up → right
-    let x = Number(scrollY) * -0.7
-    x = ((x % loop) + loop) % loop
-    track.style.transform = `translate3d(${x}px, 0, 0)`
+  const wrap = (value) => {
+    if (!loop) return 0
+    return ((value % loop) + loop) % loop
   }
 
-  requestAnimationFrame(() => {
-    measure()
-    applyX(readScroll())
-  })
+  const onScroll = (scrollY) => {
+    const delta = Number(scrollY) - lastScroll
+    lastScroll = Number(scrollY)
+
+    if (Math.abs(delta) < 0.15) return
+
+    if (delta > 0) {
+      // Scroll down → left + faster
+      direction = -1
+    } else {
+      // Scroll up → right + faster
+      direction = 1
+    }
+
+    boost = Math.min(boostMax, boost + Math.abs(delta) * boostGain)
+  }
+
+  measure()
+  requestAnimationFrame(measure)
 
   if (lenis) {
-    lenis.on('scroll', ({ scroll }) => applyX(scroll))
+    lenis.on('scroll', ({ scroll }) => onScroll(scroll))
   }
 
-  window.addEventListener('scroll', () => applyX(readScroll()), { passive: true })
+  window.addEventListener('scroll', () => onScroll(readScroll()), { passive: true })
   window.addEventListener(
     'resize',
     () => {
       measure()
-      applyX(readScroll())
+      x = wrap(x)
+      track.style.transform = `translate3d(${-x}px, 0, 0)`
     },
     { passive: true },
   )
+
+  let lastTime = performance.now()
+
+  const tick = (now) => {
+    const dt = Math.min(0.05, (now - lastTime) / 1000)
+    lastTime = now
+
+    // direction -1 (left): x increases → translate -x moves content left
+    // direction  1 (right): x decreases → content moves right
+    x = wrap(x + (baseSpeed + boost) * -direction * dt)
+    track.style.transform = `translate3d(${-x}px, 0, 0)`
+
+    boost *= boostDecay
+    if (boost < 0.4) {
+      boost = 0
+      // Return to constant left cruise when not scrolling
+      direction = -1
+    }
+
+    requestAnimationFrame(tick)
+  }
+
+  requestAnimationFrame(tick)
 }
 
 /* ---------- Premium service cards ---------- */
